@@ -7,6 +7,11 @@ public class PlayerController : MonoBehaviour
     private Rigidbody playerRb;
     private Animator playerAnim;
     public ParticleSystem explosionParticle;
+    public ParticleSystem dirtSplatter;
+
+    public AudioSource playerAudio;
+    public AudioClip jumpSound;
+    public AudioClip crashSound;
 
     private float jumpForce = 15;
     private float gravityMod = 3;
@@ -18,6 +23,7 @@ public class PlayerController : MonoBehaviour
     {
         playerRb = GetComponent<Rigidbody>();
         playerAnim = GetComponent<Animator>();
+        playerAudio = GetComponent<AudioSource>();
 
         //Amount of gravity
         Physics.gravity *= gravityMod;
@@ -31,6 +37,8 @@ public class PlayerController : MonoBehaviour
             //Jump trigger
             playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isOnGround = false;
+            dirtSplatter.Stop();
+            playerAudio.PlayOneShot(jumpSound);
 
             //Jump animation
             playerAnim.SetTrigger("Jump_trig");
@@ -42,6 +50,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isOnGround = true;
+            dirtSplatter.Play();
         }else if (collision.gameObject.CompareTag("Obstacle"))
         {
             //Death animation
@@ -50,6 +59,8 @@ public class PlayerController : MonoBehaviour
 
             //Explosion effect
             explosionParticle.Play();
+            dirtSplatter.Stop();
+            playerAudio.PlayOneShot(crashSound);
 
             //Console message
             Debug.Log("GAME OVER!");
